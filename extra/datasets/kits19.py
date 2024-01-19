@@ -25,10 +25,14 @@ mv kits19 extra/datasets
 ```
 """
 
+# Todo: Use `@functools.lru_cache(None)`?
+def get_files():
+  return sorted([x for x in DATA_DIR.iterdir()])
+
 @functools.lru_cache(None)
 def get_val_files():
   data = fetch("https://raw.githubusercontent.com/mlcommons/training/master/image_segmentation/pytorch/evaluation_cases.txt").read_text()
-  return sorted([x for x in DATA_DIR.iterdir() if x.stem.split("_")[-1] in data.split("\n")])
+  return sorted([x for x in get_files() if x.stem.split("_")[-1] in data.split("\n")])
 
 def load_pair(file_path):
   image, label = nib.load(file_path / "imaging.nii.gz"), nib.load(file_path / "segmentation.nii.gz")
@@ -69,7 +73,7 @@ def preprocess(file_path):
 
 def iterate(val=True, shuffle=False):
   if not val: raise NotImplementedError
-  files = get_val_files()
+  files = get_files()
   order = list(range(0, len(files)))
   if shuffle: random.shuffle(order)
   for file in files:
