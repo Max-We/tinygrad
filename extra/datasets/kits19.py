@@ -74,7 +74,7 @@ def iterate(val=True, shuffle=False):
   if shuffle: random.shuffle(order)
   for file in files:
     X, Y = preprocess(file)
-    X = np.expand_dims(X, axis=0)
+    # X = np.expand_dims(X, axis=0)
     i = file.stem.split("_")[-1]
     yield (X, Y, i)
 
