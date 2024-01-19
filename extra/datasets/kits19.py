@@ -1,3 +1,4 @@
+import os
 import random
 import functools
 from pathlib import Path
@@ -9,7 +10,8 @@ import torch.nn.functional as F
 from tinygrad.tensor import Tensor
 from tinygrad.helpers import fetch
 
-BASEDIR = Path(__file__).parent / "kits19" / "data"
+DATA_DIR = Path(__file__).parent / "kits19" / "data"
+PREPROCESSED_DIR = Path(__file__).parent / "kits19" / "preprocessed"
 
 """
 To download the dataset:
@@ -26,7 +28,7 @@ mv kits19 extra/datasets
 @functools.lru_cache(None)
 def get_val_files():
   data = fetch("https://raw.githubusercontent.com/mlcommons/training/master/image_segmentation/pytorch/evaluation_cases.txt").read_text()
-  return sorted([x for x in BASEDIR.iterdir() if x.stem.split("_")[-1] in data.split("\n")])
+  return sorted([x for x in DATA_DIR.iterdir() if x.stem.split("_")[-1] in data.split("\n")])
 
 def load_pair(file_path):
   image, label = nib.load(file_path / "imaging.nii.gz"), nib.load(file_path / "segmentation.nii.gz")
@@ -73,7 +75,8 @@ def iterate(val=True, shuffle=False):
   for file in files:
     X, Y = preprocess(file)
     X = np.expand_dims(X, axis=0)
-    yield (X, Y)
+    i = file.stem.split("_")[-1]
+    yield (X, Y, i)
 
 def gaussian_kernel(n, std):
   gaussian_1d = signal.gaussian(n, std)
@@ -126,6 +129,14 @@ def sliding_window_inference(model, inputs, labels, roi_shape=(128, 128, 128), o
   result = result[..., paddings[4]:image_shape[0]+paddings[4], paddings[2]:image_shape[1]+paddings[2], paddings[0]:image_shape[2]+paddings[0]]
   return result, labels
 
+def save(image, label, i: str):
+  image = image.astype(np.float32)
+  label = label.astype(np.uint8)
+  mean, std = np.round(np.mean(image, (1, 2, 3)), 2), np.round(np.std(image, (1, 2, 3)), 2)
+  print(f"Saving case {i}: shape {image.shape} mean {mean} std {std}")
+  np.save(os.path.join(PREPROCESSED_DIR, f"{i}_x.npy"), image, allow_pickle=False)
+  np.save(os.path.join(PREPROCESSED_DIR, f"{i}_y.npy"), label, allow_pickle=False)
+
 if __name__ == "__main__":
-  for X, Y in iterate():
-    print(X.shape, Y.shape)
+  for X, Y, i in iterate():
+    save(X, Y, i)
