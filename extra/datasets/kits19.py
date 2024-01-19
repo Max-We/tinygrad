@@ -27,7 +27,7 @@ mv kits19 extra/datasets
 
 # Todo: Use `@functools.lru_cache(None)`?
 def get_files():
-  return sorted([x for x in DATA_DIR.iterdir()])
+  return sorted([x for x in DATA_DIR.iterdir() if x.is_dir()])
 
 @functools.lru_cache(None)
 def get_val_files():
