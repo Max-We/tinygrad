@@ -26,13 +26,13 @@ mv kits19 extra/datasets
 """
 
 # Todo: Use `@functools.lru_cache(None)`?
-def get_files():
+def get_cases():
   return sorted([x for x in DATA_DIR.iterdir() if x.is_dir()])
 
 @functools.lru_cache(None)
-def get_val_files():
+def get_val_cases():
   data = fetch("https://raw.githubusercontent.com/mlcommons/training/master/image_segmentation/pytorch/evaluation_cases.txt").read_text()
-  return sorted([x for x in get_files() if x.stem.split("_")[-1] in data.split("\n")])
+  return sorted([x for x in get_cases() if x.stem.split("_")[-1] in data.split("\n")])
 
 def load_pair(file_path):
   image, label = nib.load(file_path / "imaging.nii.gz"), nib.load(file_path / "segmentation.nii.gz")
@@ -73,13 +73,17 @@ def preprocess(file_path):
 
 def iterate(val=True, shuffle=False):
   if not val: raise NotImplementedError
-  files = get_files()
-  order = list(range(0, len(files)))
+  cases = get_cases()
+  order = list(range(0, len(cases)))
   if shuffle: random.shuffle(order)
-  for file in files:
-    X, Y = preprocess(file)
+  for case in cases:
+    i = case.stem.split("_")[-1]
+    if not os.path.exists(case / "imaging.nii.gz") or not os.path.exists(case / "segmentation.nii.gz"):
+      print(f"Skipping case {i} because of missing folder content.")
+      continue
+
+    X, Y = preprocess(case)
     # X = np.expand_dims(X, axis=0)
-    i = file.stem.split("_")[-1]
     yield (X, Y, i)
 
 def gaussian_kernel(n, std):
