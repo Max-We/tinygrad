@@ -73,7 +73,7 @@ def get_data_split(path: str, num_shards: int, shard_id: int):
 if __name__ == "__main__":
   # shard-id = 1 ok?
   # what is shard?
-  imgs_train, imgs_val, lbls_train, lbls_val = get_data_split("../extra/datasets/kits19/preprocessed", 1, 1)
+  imgs_train, imgs_val, lbls_train, lbls_val = get_data_split("/content/tinygrad/extra/datasets/kits19/preprocessed", 1, 1)
   print(imgs_train)
 
   TRANSFER = getenv('TRANSFER')
