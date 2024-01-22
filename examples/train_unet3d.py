@@ -5,6 +5,7 @@ import os
 import numpy as np
 from PIL import Image
 
+from extra.datasets.kits19 import get_val_cases
 from extra.models.unet3d import UNet3D
 from tinygrad.nn.state import get_parameters
 from tinygrad.nn import optim
@@ -53,9 +54,7 @@ def split_eval_data(x_val, y_val, num_shards, shard_id):
 
 
 def get_data_split(path: str, num_shards: int, shard_id: int):
-    with open("evaluation_cases.txt", "r") as f:
-        val_cases_list = f.readlines()
-    val_cases_list = [case.rstrip("\n") for case in val_cases_list]
+    val_cases_list = get_val_cases()
     imgs = load_data(path, "*_x.npy")
     lbls = load_data(path, "*_y.npy")
     assert len(imgs) == len(lbls), f"Found {len(imgs)} volumes but {len(lbls)} corresponding masks"
