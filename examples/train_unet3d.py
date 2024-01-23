@@ -5,22 +5,14 @@ import os
 import numpy as np
 from PIL import Image
 
+from examples.mlperf.losses import dice_ce_loss
 from extra.datasets.kits19 import get_val_cases
 from extra.models.unet3d import UNet3D
+from tinygrad import Tensor
 from tinygrad.nn.state import get_parameters
 from tinygrad.nn import optim
 from tinygrad.helpers import getenv
 from extra.training import train, evaluate
-
-MAX_EPOCHS = 4000
-QUALITY_THRESHOLD = "0.908"
-START_EVAL_AT = 1000
-EVALUATE_EVERY = 20
-LEARNING_RATE = "0.8"
-LR_WARMUP_EPOCHS = 200
-DATASET_DIR = "/data"
-BATCH_SIZE = 2
-GRADIENT_ACCUMULATION_STEPS = 1
 
 # MAX_EPOCHS = 500
 # STEPS = 250
@@ -69,20 +61,47 @@ def get_data_split(path: str, num_shards: int, shard_id: int):
     imgs_val, lbls_val = split_eval_data(imgs_val, lbls_val, num_shards, shard_id)
     return imgs_train, imgs_val, lbls_train, lbls_val
 
+# from training/image_segmentation/pytorch/run_and_time.sh
+MAX_EPOCHS = 4000
+QUALITY_THRESHOLD = "0.908"
+START_EVAL_AT = 1000
+EVALUATE_EVERY = 20
+LEARNING_RATE = 0.8
+LR_WARMUP_EPOCHS = 200
+DATASET_DIR = "/data"
+BATCH_SIZE = 2
+GRADIENT_ACCUMULATION_STEPS = 1
+
+# from mlcommons/training_policies/blob/master/training_rules.adoc#91-hyperparameters
+MOMENTUM = 0.9
 
 if __name__ == "__main__":
-  # shard-id = 1 ok?
-  # what is shard?
+  # returns all file paths to train / val data
   imgs_train, imgs_val, lbls_train, lbls_val = get_data_split("/content/tinygrad/extra/datasets/kits19/preprocessed", 1, 0)
-  print(imgs_train)
 
-  TRANSFER = getenv('TRANSFER')
   model = UNet3D()
+  optimizer = optim.SGD(get_parameters(model), lr=LEARNING_RATE, momentum=MOMENTUM)
 
-  lr = 5e-3
+  for epoch in range(1, MAX_EPOCHS + 1):
 
-  for _ in range(5):
-    optimizer = optim.SGD(get_parameters(model), lr=lr, momentum=0.9)
+    # lr warmup
+    loss_value = None
+    optimizer.zero_grad()
+
+    with Tensor.train():
+      for i in range(len(imgs_train)):
+        # Batching?
+        # Transforming?
+        # requires_grad?
+        image, label = Tensor(np.load(imgs_train[i]), requires_grad=False), Tensor(np.load(label[i]))
+
+        out = model(image)
+        loss = dice_ce_loss(out, label)
+        loss.backward()
+        optimizer.step()
+
+        print(loss.realize())
+
     # train(model, X_train, Y_train, optimizer, 100, BS=BATCH_SIZE, transform=transform)
     # evaluate(model, X_test, Y_test, num_classes=classes, transform=transform)
     # lr /= 1.2
