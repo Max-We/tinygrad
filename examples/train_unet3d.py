@@ -93,7 +93,7 @@ if __name__ == "__main__":
         # Batching?
         # Transforming?
         # requires_grad?
-        image, label = Tensor(np.load(imgs_train[i]), requires_grad=False), Tensor(np.load(label[i]))
+        image, label = Tensor(np.load(imgs_train[i]), requires_grad=False), Tensor(np.load(lbls_train[i]))
 
         out = model(image)
         loss = dice_ce_loss(out, label)
