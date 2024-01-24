@@ -20,6 +20,7 @@ class UpsampleBlock:
 
   def __call__(self, x, skip):
     x = x.sequential(self.upsample_conv)
+    print(x.shape, skip.shape)
     x = Tensor.cat(x, skip, dim=1)
     return x.sequential(self.conv1).sequential(self.conv2)
 
