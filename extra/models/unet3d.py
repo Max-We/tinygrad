@@ -19,6 +19,7 @@ class UpsampleBlock:
     self.conv2 = [nn.Conv2d(c1, c1, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False), nn.InstanceNorm(c1), Tensor.relu]
 
   def __call__(self, x, skip):
+    print("Before upsample", x)
     x = x.sequential(self.upsample_conv)
     print(x.shape, skip.shape)
     x = Tensor.cat(x, skip, dim=1)
