@@ -19,7 +19,7 @@ class UpsampleBlock:
     self.conv2 = [nn.Conv2d(c1, c1, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False), nn.InstanceNorm(c1), Tensor.relu]
 
   def __call__(self, x, skip):
-    print("Before upsample", x)
+    print("Before upsample", x.shape)
     x = x.sequential(self.upsample_conv)
     print(x.shape, skip.shape)
     x = Tensor.cat(x, skip, dim=1)
@@ -41,7 +41,9 @@ class UNet3D:
     for downsample in self.downsample:
       x = downsample(x)
       outputs.append(x)
+    print("Before bn", x.shape)
     x = self.bottleneck(x)
+    print("After bn", x.shape)
     for upsample, skip in zip(self.upsample, outputs[::-1]):
       x = upsample(x, skip)
     x = self.output["conv"](x)
