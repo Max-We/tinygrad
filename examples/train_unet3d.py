@@ -103,11 +103,11 @@ if __name__ == "__main__":
 
     # - lr warmup?
     loss_value = None
-    optimizer.zero_grad()
 
     with Tensor.train():
       for i in range(len(imgs_train)):
         # - Batching?
+        optimizer.zero_grad()
 
         # transform
         print("Transform")
