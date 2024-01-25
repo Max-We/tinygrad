@@ -108,6 +108,8 @@ if __name__ == "__main__":
         print("Loss")
         loss = dice_ce_loss(out, label)
         loss.backward()
+        print("Loss", loss.realize())
+
         optimizer.step()
 
         print("Loss", loss.realize())
