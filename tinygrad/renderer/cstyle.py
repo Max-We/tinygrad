@@ -7,7 +7,7 @@ from tinygrad.helpers import prod, strip_parens, getenv
 from tinygrad.dtype import ImageDType, dtypes, DType, PtrDType
 
 class CStyleLanguage(NamedTuple):
-  size_prefix: str = "ptrdiff_t"
+  size_prefix: str = "int"
   generic_var_prefix: str = ""
   kernel_prefix: str = ""
   buffer_prefix: str = ""
@@ -249,7 +249,6 @@ class CUDALanguage(CStyleLanguage):
       "g": lambda x: f"blockIdx.{chr(120+x)}", "l": lambda x: f"threadIdx.{chr(120+x)}",
       "i": lambda x: f"(blockIdx.{chr(120+x)}*blockDim.{chr(120+x)}+threadIdx.{chr(120+x)})"
   }
-  launch_bounds = True
   code_for_op = {**CStyleLanguage().code_for_op, **code_for_op_half}
   half_prekernel ="#include <cuda_fp16.h>\n"+"#include <cuda_bf16.h>\n"+"""
     struct half4 { half x, y, z, w; };
