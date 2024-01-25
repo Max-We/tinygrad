@@ -8,7 +8,7 @@ from PIL import Image
 from examples.mlperf.losses import dice_ce_loss
 from extra.datasets.kits19 import get_val_cases, transform
 from extra.models.unet3d import UNet3D
-from tinygrad import Tensor
+from tinygrad import Tensor, dtypes
 from tinygrad.nn.state import get_parameters
 from tinygrad.nn import optim
 from tinygrad.helpers import getenv
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         # tensor
         # - requires_grad?
         image, label = np.expand_dims(image, axis=0), np.expand_dims(label, axis=0)
-        image, label = Tensor(image, requires_grad=False), Tensor(label)
+        image, label = Tensor(image, requires_grad=False, dtype=dtypes.float), Tensor(label, dtype=dtypes.uint8)
 
         out = model(image)
         loss = dice_ce_loss(out, label)
