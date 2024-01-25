@@ -94,7 +94,7 @@ if __name__ == "__main__":
         # Transforming?
         # requires_grad?
         # image, label = Tensor(np.expand_dims(np.load(imgs_train[i]), axis=0), requires_grad=False), Tensor(np.expand_dims(np.load(lbls_train[i]), axis=0))
-        image, label = np.expand_dims(np.load(imgs_train[i]), axis=0), np.expand_dims(np.load(lbls_train[i]), axis=0)
+        # image, label = np.expand_dims(np.load(imgs_train[i]), axis=0), np.expand_dims(np.load(lbls_train[i]), axis=0)
         # image = np.expand_dims(image, axis=0)
         # label = np.expand_dims(label, axis=0)
 
