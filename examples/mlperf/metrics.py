@@ -3,6 +3,9 @@ import string
 from collections import Counter
 import numpy as np
 
+from tinygrad import Tensor, dtypes
+
+
 def levenshtein(a, b):
   n, m = len(a), len(b)
   if n > m:
@@ -29,10 +32,16 @@ def word_error_rate(x, y):
     scores += levenshtein(h_list, r_list)
   return float(scores) / words, float(scores), words
 
-def one_hot(arr, num_classes=3):
-  res = np.eye(num_classes)[np.array(arr).reshape(-1)]
-  arr = res.reshape(list(arr.shape) + [num_classes])
-  arr = arr.transpose((0, 4, 1, 2, 3)).astype(np.float32)
+# def one_hot(arr, num_classes=3):
+#   res = np.eye(num_classes)[np.array(arr).reshape(-1)]
+#   arr = res.reshape(list(arr.shape) + [num_classes])
+#   arr = arr.transpose((0, 4, 1, 2, 3)).astype(np.float32)
+#   return arr
+
+def one_hot(arr: Tensor, layout="NCDHW", channel_axis=1, num_classes=3):
+  arr = arr.squeeze(dim=channel_axis)
+  arr= Tensor.eye(num_classes, dtype=dtypes.int32, device=arr.device)[arr]
+  if layout == "NCDHW": arr= arr.permute(0, 4, 1, 2, 3)
   return arr
 
 def get_dice_score(prediction, target, channel_axis=1, smooth_nr=1e-6, smooth_dr=1e-6):

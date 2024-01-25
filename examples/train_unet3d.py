@@ -97,6 +97,7 @@ if __name__ == "__main__":
 
         # tensor
         # - requires_grad?
+        # - expand during preprocess?
         image, label = np.expand_dims(image, axis=0), np.expand_dims(label, axis=0)
         image, label = Tensor(image, requires_grad=False, dtype=dtypes.float), Tensor(label, dtype=dtypes.uint8)
 
