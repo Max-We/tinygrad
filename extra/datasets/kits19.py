@@ -10,8 +10,11 @@ import torch.nn.functional as F
 from tinygrad.tensor import Tensor
 from tinygrad.helpers import fetch
 
-DATA_DIR = Path(__file__).parent / "kits19" / "data"
-PREPROCESSED_DIR = Path(__file__).parent / "kits19" / "preprocessed"
+# DATA_DIR = Path(__file__).parent / "kits19" / "data"
+# PREPROCESSED_DIR = Path(__file__).parent / "kits19" / "preprocessed"
+
+DATA_DIR = "/content/drive/MyDrive/AI/kits19/data"
+PREPROCESSED_DIR = "/content/drive/MyDrive/AI/kits19/preprocessed"
 
 """
 To download the dataset:
