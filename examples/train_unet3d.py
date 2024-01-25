@@ -77,7 +77,7 @@ MOMENTUM = 0.9
 
 if __name__ == "__main__":
   # returns all file paths to train / val data
-  imgs_train, imgs_val, lbls_train, lbls_val = get_data_split("/content/tinygrad/extra/datasets/kits19/preprocessed", 1, 0)
+  imgs_train, imgs_val, lbls_train, lbls_val = get_data_split("/content/drive/MyDrive/AI/kits19/preprocessed", 1, 0)
 
   model = UNet3D()
   optimizer = optim.SGD(get_parameters(model), lr=LEARNING_RATE, momentum=MOMENTUM)

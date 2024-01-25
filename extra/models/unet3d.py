@@ -31,7 +31,7 @@ class UNet3D:
     inp, out = filters[:-1], filters[1:]
     self.input_block = DownsampleBlock(in_channels, filters[0], stride=1)
     self.downsample = [DownsampleBlock(i, o) for i, o in zip(inp, out)]
-    self.bottleneck = DownsampleBlock(filters[-1], filters[-1], stride=1)
+    self.bottleneck = DownsampleBlock(filters[-1], filters[-1])
     self.upsample = [UpsampleBlock(filters[-1], filters[-1])] + [UpsampleBlock(i, o) for i, o in zip(out[::-1], inp[::-1])]
     self.output = {"conv": nn.Conv2d(filters[0], n_class, kernel_size=(1, 1, 1))}
 
@@ -41,9 +41,11 @@ class UNet3D:
     for downsample in self.downsample:
       x = downsample(x)
       outputs.append(x)
+
     print("Before bn", x.shape)
     x = self.bottleneck(x)
     print("After bn", x.shape)
+
     for upsample, skip in zip(self.upsample, outputs[::-1]):
       x = upsample(x, skip)
     x = self.output["conv"](x)
