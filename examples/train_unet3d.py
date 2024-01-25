@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 
 from examples.mlperf.losses import dice_ce_loss
-from extra.datasets.kits19 import get_val_cases
+from extra.datasets.kits19 import get_val_cases, transform
 from extra.models.unet3d import UNet3D
 from tinygrad import Tensor
 from tinygrad.nn.state import get_parameters
@@ -96,6 +96,9 @@ if __name__ == "__main__":
         image, label = Tensor(np.expand_dims(np.load(imgs_train[i]), axis=0), requires_grad=False), Tensor(np.expand_dims(np.load(lbls_train[i]), axis=0))
         # image = np.expand_dims(image, axis=0)
         # label = np.expand_dims(label, axis=0)
+
+        # transform
+        image, label = transform(image, label)
 
         out = model(image)
         loss = dice_ce_loss(out, label)

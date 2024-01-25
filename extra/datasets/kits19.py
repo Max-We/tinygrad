@@ -4,7 +4,7 @@ import functools
 from pathlib import Path
 import numpy as np
 import nibabel as nib
-from scipy import signal
+from scipy import signal, ndimage
 import torch
 import torch.nn.functional as F
 from tinygrad.tensor import Tensor
@@ -147,6 +147,93 @@ def save(image, label, i: str):
   print(f"Saving case {i}: shape {image.shape} mean {mean} std {std}")
   np.save(os.path.join(PREPROCESSED_DIR, f"{i}_x.npy"), image, allow_pickle=False)
   np.save(os.path.join(PREPROCESSED_DIR, f"{i}_y.npy"), label, allow_pickle=False)
+
+def get_cords(cord, idx, patch_size):
+  return cord[idx], cord[idx] + patch_size[idx]
+
+def randrange(max_range):
+  return 0 if max_range == 0 else random.randrange(max_range)
+
+def _rand_crop(image, label, patch_size):
+  ranges = [s - p for s, p in zip(image.shape[1:], patch_size)]
+  cord = [randrange(x) for x in ranges]
+  low_x, high_x = get_cords(cord, 0, patch_size)
+  low_y, high_y = get_cords(cord, 1, patch_size)
+  low_z, high_z = get_cords(cord, 2, patch_size)
+  image = image[:, low_x:high_x, low_y:high_y, low_z:high_z]
+  label = label[:, low_x:high_x, low_y:high_y, low_z:high_z]
+  return image, label, [low_x, high_x, low_y, high_y, low_z, high_z]
+
+def _rand_foreg_cropd(image, label, patch_size):
+  def adjust(foreg_slice, patch_size, label, idx):
+    diff = patch_size[idx - 1] - (foreg_slice[idx].stop - foreg_slice[idx].start)
+    sign = -1 if diff < 0 else 1
+    diff = abs(diff)
+    ladj = randrange(diff)
+    hadj = diff - ladj
+    low = max(0, foreg_slice[idx].start - sign * ladj)
+    high = min(label.shape[idx], foreg_slice[idx].stop + sign * hadj)
+    diff = patch_size[idx - 1] - (high - low)
+    if diff > 0 and low == 0:
+      high += diff
+    elif diff > 0:
+      low -= diff
+    return low, high
+
+  cl = np.random.choice(np.unique(label[label > 0]))
+  foreg_slices = ndimage.find_objects(ndimage.measurements.label(label==cl)[0])
+  foreg_slices = [x for x in foreg_slices if x is not None]
+  slice_volumes = [np.prod([s.stop - s.start for s in sl]) for sl in foreg_slices]
+  slice_idx = np.argsort(slice_volumes)[-2:]
+  foreg_slices = [foreg_slices[i] for i in slice_idx]
+  if not foreg_slices:
+      return _rand_crop(image, label, patch_size)
+  foreg_slice = foreg_slices[random.randrange(len(foreg_slices))]
+  low_x, high_x = adjust(foreg_slice, patch_size, label, 1)
+  low_y, high_y = adjust(foreg_slice, patch_size, label, 2)
+  low_z, high_z = adjust(foreg_slice, patch_size, label, 3)
+  image = image[:, low_x:high_x, low_y:high_y, low_z:high_z]
+  label = label[:, low_x:high_x, low_y:high_y, low_z:high_z]
+  return image, label, [low_x, high_x, low_y, high_y, low_z, high_z]
+
+def rand_crop(image, label, patch_size, oversampling):
+  if random.random() < oversampling:
+    image, label, cords = _rand_foreg_cropd(image, label, patch_size)
+  else:
+    image, label, cords = _rand_crop(image, label, patch_size)
+  return image, label
+
+def rand_flip(image, label, axis=[1,2,3]):
+  prob = 1/len(axis)
+  def _flip(image, label, axis):
+    return np.flip(image, axis=axis).copy(), np.flip(label, axis=axis).copy()
+  for ax in axis:
+    if random.random() < prob:
+      image, label = _flip(image, label, ax)
+  return image, label
+
+def cast(image, label, types=(np.float32, np.uint8)):
+  return image.astype(types[0]), label.astype(types[1])
+
+def rand_brightness(image, label, factor=0.3, prob=0.1):
+  if random.random() < prob:
+    fac = np.random.uniform(low=1.0-factor, high=1.0+factor, size=1)
+    image = (image * (1 + fac)).astype(image.dtype)
+  return image, label
+
+def gaussian_noise(image, label, mean=0.0, std=0.1, prob=0.1):
+  if random.random() < prob:
+    scale = np.random.uniform(low=0.0, high=std)
+    noise = np.random.normal(loc=mean, scale=scale, size=image.shape).astype(image.dtype)
+    image += noise
+  return image, label
+
+def transform(X, Y, patch_size=(128,128,128), oversampling=0.25):
+  X,Y = rand_flip(X,Y)
+  X,Y = rand_brightness(X,Y)
+  X,Y = gaussian_noise(X,Y)
+  X,Y = rand_crop(X, Y, patch_size, oversampling)
+  return X,Y
 
 if __name__ == "__main__":
   for X, Y, i in iterate():
