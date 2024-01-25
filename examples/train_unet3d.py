@@ -99,7 +99,10 @@ if __name__ == "__main__":
         # label = np.expand_dims(label, axis=0)
 
         # transform
-        image, label = transform(image, label)
+        image, label = transform(imgs_train[i], lbls_train[i])
+
+        # conv to tensor
+        image, label = np.expand_dims(np.load(imgs_train[i]), axis=0), np.expand_dims(np.load(lbls_train[i]), axis=0)
         image, label = Tensor(image, requires_grad=False), Tensor(label)
 
         out = model(image)
