@@ -8,7 +8,7 @@ from PIL import Image
 from examples.mlperf.losses import dice_ce_loss
 from extra.datasets.kits19 import get_val_cases, transform
 from extra.models.unet3d import UNet3D
-from tinygrad import Tensor, dtypes
+from tinygrad import Tensor, dtypes, TinyJit
 from tinygrad.nn.state import get_parameters
 from tinygrad.nn import optim
 from tinygrad.helpers import getenv
@@ -75,6 +75,23 @@ GRADIENT_ACCUMULATION_STEPS = 1
 # from mlcommons/training_policies/blob/master/training_rules.adoc#91-hyperparameters
 MOMENTUM = 0.9
 
+
+@TinyJit
+def step(x, y, model, optimizer):
+    print("Forward")
+    out = model(x)
+
+    print("Loss")
+    loss = dice_ce_loss(out, y)
+
+    print("Gradients")
+    loss.backward()
+
+    print("Update")
+    optimizer.step()
+
+    return loss.realize()
+
 if __name__ == "__main__":
   # returns all file paths to train / val data
   imgs_train, imgs_val, lbls_train, lbls_val = get_data_split("/content/drive/MyDrive/AI/kits19/preprocessed", 1, 0)
@@ -102,19 +119,8 @@ if __name__ == "__main__":
         image, label = np.expand_dims(image, axis=0), np.expand_dims(label, axis=0)
         image, label = Tensor(image, requires_grad=False, dtype=dtypes.float), Tensor(label, dtype=dtypes.uint8)
 
-        print("Forward")
-        out = model(image)
-
-        print("Loss")
-        loss = dice_ce_loss(out, label)
-
-        print("Gradients")
-        loss.backward()
-
-        print("Update")
-        optimizer.step()
-
-        print("Loss", loss.realize())
+        loss = step(image, label, model, optimizer)
+        print("Loss", loss)
 
     # train(model, X_train, Y_train, optimizer, 100, BS=BATCH_SIZE, transform=transform)
     # evaluate(model, X_test, Y_test, num_classes=classes, transform=transform)
