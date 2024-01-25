@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
   for epoch in range(1, MAX_EPOCHS + 1):
 
-    # lr warmup
+    # - lr warmup?
     loss_value = None
     optimizer.zero_grad()
 
@@ -93,6 +93,7 @@ if __name__ == "__main__":
         # - Batching?
 
         # transform
+        print("Transform")
         image, label = transform(np.load(imgs_train[i]), np.load(lbls_train[i]))
 
         # tensor
@@ -101,12 +102,15 @@ if __name__ == "__main__":
         image, label = np.expand_dims(image, axis=0), np.expand_dims(label, axis=0)
         image, label = Tensor(image, requires_grad=False, dtype=dtypes.float), Tensor(label, dtype=dtypes.uint8)
 
+        print("Forward")
         out = model(image)
+
+        print("Loss")
         loss = dice_ce_loss(out, label)
         loss.backward()
         optimizer.step()
 
-        print(loss.realize())
+        print("Loss", loss.realize())
 
     # train(model, X_train, Y_train, optimizer, 100, BS=BATCH_SIZE, transform=transform)
     # evaluate(model, X_test, Y_test, num_classes=classes, transform=transform)
