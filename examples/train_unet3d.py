@@ -90,18 +90,13 @@ if __name__ == "__main__":
 
     with Tensor.train():
       for i in range(len(imgs_train)):
-        # Batching?
-        # Transforming?
-        # requires_grad?
-        # image, label = Tensor(np.expand_dims(np.load(imgs_train[i]), axis=0), requires_grad=False), Tensor(np.expand_dims(np.load(lbls_train[i]), axis=0))
-        # image, label = np.expand_dims(np.load(imgs_train[i]), axis=0), np.expand_dims(np.load(lbls_train[i]), axis=0)
-        # image = np.expand_dims(image, axis=0)
-        # label = np.expand_dims(label, axis=0)
+        # - Batching?
 
         # transform
         image, label = transform(np.load(imgs_train[i]), np.load(lbls_train[i]))
 
-        # conv to tensor
+        # tensor
+        # - requires_grad?
         image, label = np.expand_dims(image, axis=0), np.expand_dims(label, axis=0)
         image, label = Tensor(image, requires_grad=False), Tensor(label)
 

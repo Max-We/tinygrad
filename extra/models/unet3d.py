@@ -36,18 +36,14 @@ class UNet3D:
     self.output = {"conv": nn.Conv2d(filters[0], n_class, kernel_size=(1, 1, 1))}
 
   def __call__(self, x):
-    print("Input shape", x.shape)
     x = self.input_block(x)
     outputs = [x]
 
     for downsample in self.downsample:
       x = downsample(x)
       outputs.append(x)
-      print("Downsample", x.shape)
 
-    print("Before bn", x.shape)
     x = self.bottleneck(x)
-    print("After bn", x.shape)
 
     for upsample, skip in zip(self.upsample, outputs[::-1]):
       x = upsample(x, skip)
