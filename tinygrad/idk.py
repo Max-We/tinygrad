@@ -10,10 +10,10 @@ print("Realize conv")
 conv_out = conv(t).realize()
 
 print("Realize norm")
-norm_out = norm(conv_out)
+norm_out = norm(conv_out).realize()
 
 print("Realize relu")
-norm_out.relu().realize()
+relu_out = norm_out.relu().realize()
 
 print("All done")
 
@@ -21,4 +21,4 @@ print("Realize sequential")
 print(t.sequential(seq).realize())
 
 print("Realize conv2")
-conv_out2 = conv2(t).realize()
+conv_out2 = conv2(relu_out).realize()
