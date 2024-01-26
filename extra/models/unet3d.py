@@ -14,7 +14,12 @@ class DownsampleBlock:
     idk = x.sequential(self.conv1)
     print("realize idk")
     idk.realize()
-    return idk.sequential(self.conv2)
+
+    idk2 = idk.sequential(self.conv2)
+    print("realize idk2")
+    idk2.realize()
+
+    return idk2
 
 class UpsampleBlock:
   def __init__(self, c0, c1):
