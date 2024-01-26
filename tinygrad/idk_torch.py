@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+torch.backends.cudnn.deterministic = True
+
 # Assuming input tensor shape is (batch_size, channels, depth, height, width)
 input_tensor = torch.randn((1, 32, 128, 128, 128))
 
