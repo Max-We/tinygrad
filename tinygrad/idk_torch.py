@@ -5,7 +5,7 @@ import torch.nn as nn
 input_tensor = torch.randn((1, 32*128, 128, 128))
 
 # Define 3D convolution layer
-conv = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(3, 3), padding=(1, 1))
+conv = nn.Conv2d(in_channels=32*128, out_channels=32*128, kernel_size=(3, 3), padding=(1, 1))
 
 # Apply convolution
 conv_out = conv(input_tensor)
