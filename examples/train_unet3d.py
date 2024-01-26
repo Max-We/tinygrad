@@ -81,6 +81,9 @@ def step(x, y, model, optimizer):
     print("Forward")
     out = model(x)
 
+    print("Realize out")
+    out.realize()
+
     print("Loss")
     loss = dice_ce_loss(out, y)
 
