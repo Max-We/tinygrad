@@ -10,7 +10,10 @@ class DownsampleBlock:
     self.conv2 = [nn.Conv2d(c1, c1, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False), nn.InstanceNorm(c1), Tensor.relu]
 
   def __call__(self, x):
-    return x.sequential(self.conv1).sequential(self.conv2)
+    idk = x.sequential(self.conv1)
+    print("realize idk")
+    idk.realize()
+    return idk.sequential(self.conv2)
 
 class UpsampleBlock:
   def __init__(self, c0, c1):
@@ -36,9 +39,6 @@ class UNet3D:
   def __call__(self, x):
     x = self.input_block(x)
     outputs = [x]
-
-    print("Realize x after input block")
-    x.realize()
 
     for downsample in self.downsample:
       x = downsample(x)
