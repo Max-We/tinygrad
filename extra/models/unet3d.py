@@ -43,6 +43,9 @@ class UNet3D:
 
     x = self.bottleneck(x)
 
+    print("Realize x after bottleneck")
+    x.realize()
+
     for upsample, skip in zip(self.upsample, outputs[::-1]):
       x = upsample(x, skip)
     x = self.output["conv"](x)

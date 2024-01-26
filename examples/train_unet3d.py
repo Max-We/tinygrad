@@ -78,9 +78,6 @@ MOMENTUM = 0.9
 
 @TinyJit
 def step(x, y, model, optimizer):
-    print("Realize x")
-    print(x.realize())
-
     print("Forward")
     out = model(x)
 
