@@ -34,12 +34,11 @@ class UNet3D:
     self.output = {"conv": nn.Conv2d(filters[0], n_class, kernel_size=(1, 1, 1))}
 
   def __call__(self, x):
-
-    print("Realize x before input block")
-    x.realize()
-
     x = self.input_block(x)
     outputs = [x]
+
+    print("Realize x after input block")
+    x.realize()
 
     for downsample in self.downsample:
       x = downsample(x)
