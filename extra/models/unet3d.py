@@ -41,10 +41,10 @@ class UNet3D:
       x = downsample(x)
       outputs.append(x)
 
-    x = self.bottleneck(x)
-
-    print("Realize x after bottleneck")
+    print("Realize x before bottleneck")
     x.realize()
+
+    x = self.bottleneck(x)
 
     for upsample, skip in zip(self.upsample, outputs[::-1]):
       x = upsample(x, skip)
