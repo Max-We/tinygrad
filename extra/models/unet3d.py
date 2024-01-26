@@ -37,6 +37,7 @@ class UNet3D:
     self.output = {"conv": nn.Conv2d(filters[0], n_class, kernel_size=(1, 1, 1))}
 
   def __call__(self, x):
+    print("X shape", x.shape)
     x = self.input_block(x)
     outputs = [x]
 
