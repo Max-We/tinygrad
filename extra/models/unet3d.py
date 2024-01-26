@@ -35,14 +35,15 @@ class UNet3D:
 
   def __call__(self, x):
     x = self.input_block(x)
+
+    print("Realize x after input block")
+    x.realize()
+
     outputs = [x]
 
     for downsample in self.downsample:
       x = downsample(x)
       outputs.append(x)
-
-    print("Realize x before bottleneck")
-    x.realize()
 
     x = self.bottleneck(x)
 
