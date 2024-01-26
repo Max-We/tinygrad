@@ -11,4 +11,4 @@ conv = nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(3, 3, 3), padding
 conv_out = conv(input_tensor)
 
 # Print the result
-print(conv_out)
+print(conv_out.shape)
