@@ -6,6 +6,7 @@ from tinygrad.helpers import fetch, get_child
 
 class DownsampleBlock:
   def __init__(self, c0, c1, stride=2):
+    print("c0, c1", c0, c1)
     self.conv1 = [nn.Conv2d(c0, c1, kernel_size=(3,3,3), stride=stride, padding=(1,1,1,1,1,1), bias=False), nn.InstanceNorm(c1), Tensor.relu]
     self.conv2 = [nn.Conv2d(c1, c1, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False), nn.InstanceNorm(c1), Tensor.relu]
 
