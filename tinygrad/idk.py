@@ -13,7 +13,8 @@ print("Realize multiple")
 
 a = conv(t)
 b = conv(a)
-print(b.realize().shape)
+c = conv(b)
+print(c.realize().shape)
 
 # print("Realize seq")
 # t.sequential([conv, conv, conv]).realize()
