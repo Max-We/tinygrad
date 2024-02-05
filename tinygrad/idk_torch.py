@@ -12,7 +12,7 @@ conv = nn.Conv3d(in_channels=channels, out_channels=channels, kernel_size=(3, 3,
 
 # Apply convolution
 comp = torch.compile(conv)
-conv_out = comp(input_tensor)
+conv_out = comp(input_tensor, backend="eager")
 
 # Print the result
 print(conv_out.shape)
