@@ -13,7 +13,7 @@ conv = nn.Conv3d(in_channels=channels, out_channels=channels, kernel_size=(3, 3,
 print(torch.compiler.list_backends(exclude_tags=('debug', 'experimental')))
 
 # Apply convolution
-comp = torch.compile(conv, backend="eager")
+comp = torch.compile(conv, backend="cudagraphs")
 conv_out = comp(input_tensor)
 
 # Print the result
