@@ -11,8 +11,8 @@ input_tensor = torch.randn((1, channels, 128, 128, 128))
 conv = nn.Conv3d(in_channels=channels, out_channels=channels, kernel_size=(3, 3, 3), padding=(1, 1, 1))
 
 # Apply convolution
-comp = torch.compile(conv)
-conv_out = comp(input_tensor, backend="eager")
+comp = torch.compile(conv, backend="eager")
+conv_out = comp(input_tensor)
 
 # Print the result
 print(conv_out.shape)
