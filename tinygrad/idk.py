@@ -9,8 +9,11 @@ conv = nn.Conv2d(32, 32, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False)
 # mit wenig ram -> fail
 # mit viel ram -> success
 # mit viel ram & seq -> ?
-print("Realize seq og")
-t.sequential(conv).sequential(conv).sequential(conv)
+print("Realize multiple")
+
+a = conv(t)
+b = conv(a)
+print(b.realize().shape)
 
 # print("Realize seq")
 # t.sequential([conv, conv, conv]).realize()
