@@ -12,8 +12,8 @@ seq = [conv, norm, relu]
 print("Realize conv 1")
 conv_out = conv(t1).realize()
 
-print("Realize conv 2")
-conv_out = conv(t2).realize()
+# print("Realize conv 2")
+# conv_out = conv(t2).realize()
 
 # mit wenig ram -> fail
 # mit viel ram -> success
@@ -27,3 +27,5 @@ conv_out = conv(t2).realize()
 
 # print("Realize seq")
 # t.sequential([conv, conv, conv]).realize()
+
+print("Done")
