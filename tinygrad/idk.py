@@ -1,15 +1,19 @@
 from tinygrad import Tensor, nn
 
-channels = 320
-t = Tensor.rand((1, channels, 128, 128, 128))
+channels = 32
+t1 = Tensor.rand((1, channels, 128, 128, 128))
+t2 = Tensor.rand((1, channels, 128, 128, 128))
 conv = nn.Conv2d(channels, channels, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False)
 norm = nn.InstanceNorm(channels)
 relu = Tensor.relu
 
 seq = [conv, norm, relu]
 
-print("Realize conv")
-conv_out = conv(t).realize()
+print("Realize conv 1")
+conv_out = conv(t1).realize()
+
+print("Realize conv 2")
+conv_out = conv(t2).realize()
 
 # mit wenig ram -> fail
 # mit viel ram -> success
