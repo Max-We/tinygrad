@@ -5,7 +5,7 @@ channels = 32
 
 @TinyJit
 def do_ops():
-  with Tensor.train:
+  with Tensor.train():
     t = Tensor.rand((1, channels, 128, 128, 128))
     conv = nn.Conv2d(channels, channels, kernel_size=(3,3,3), padding=(1,1,1,1,1,1), bias=False)
     norm = nn.InstanceNorm(channels)
